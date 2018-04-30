@@ -31,7 +31,7 @@ public class GlobalAppConfig {
 
     @Bean
     public PasswordEncoder userPasswordEncoder() {
-        return new BCryptPasswordEncoder(8);
+        return new BCryptPasswordEncoder(12);
     }
 
 
