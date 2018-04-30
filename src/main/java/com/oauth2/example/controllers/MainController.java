@@ -1,30 +1,25 @@
 package com.oauth2.example.controllers;
 
 import com.oauth2.example.dtos.UserDTO;
-import com.oauth2.example.entities.Role;
-import com.oauth2.example.entities.User;
-import com.oauth2.example.repositories.RoleRepository;
-import com.oauth2.example.repositories.UserRepository;
+import com.oauth2.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.Set;
 
 @RestController
 public class MainController {
 
     @Autowired
-    private PasswordEncoder userPasswordEncoder;
-    @Autowired
-    private UserRepository userRepository;
-    @Resource(name = "roleRepository")
-    private RoleRepository roleRepository;
+    private UserDetailsService userDetailsService;
+    @Resource(name = "userDetailsService")
+    private UserService userService;
 
     @RequestMapping("/user/profile")
     @Secured({"ROLE_CUSTOMER"})
@@ -33,18 +28,17 @@ public class MainController {
     }
 
     @RequestMapping(value = "/register", method = {RequestMethod.POST})
-    @Transactional
-    public String registerNewUser(@RequestBody UserDTO userDTO) {
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(userPasswordEncoder.encode(userDTO.getPassword()));
-        Role customerRole = roleRepository.findOneByRole("ROLE_CUSTOMER");
-        Set<Role> roles = new HashSet<>();
-        roles.add(customerRole);
-        user.setEnabled(false);
-        user.setRoles(roles);
-        userRepository.save(user);
-        return "Success";
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public void registerNewUser(@RequestBody UserDTO userDTO) throws Exception {
+        Assert.notNull(userDTO,"Request body cannot be empty.");
+        Assert.notNull(userDTO.getUsername(),"User name cannot be empty.");
+        Assert.notNull(userDTO.getPassword(),"Password cannot be empty.");
+        UserDetails user = userDetailsService.loadUserByUsername(userDTO.getUsername());
+        if (user != null){
+            throw new Exception("User already exists");
+        }
+        userService.createNewUser(userDTO);
+        return;
     }
 
     @RequestMapping(value = "/admin/user")
@@ -52,7 +46,7 @@ public class MainController {
         return new Principal() {
             @Override
             public String getName() {
-                return userRepository.findOneByUsername(username).getUsername();
+                return userDetailsService.loadUserByUsername(username).getUsername();
             }
         };
 
