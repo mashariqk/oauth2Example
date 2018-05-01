@@ -6,6 +6,7 @@ public class UserDTO implements Serializable {
 
     private String username;
     private String password;
+    private Boolean enabled;
 
     public String getUsername() {
         return username;
@@ -23,9 +24,18 @@ public class UserDTO implements Serializable {
         this.password = password;
     }
 
-    public UserDTO(String username, String password) {
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public UserDTO(String username, String password, Boolean enabled) {
         this.username = username;
         this.password = password;
+        this.enabled = enabled;
     }
 
     public UserDTO() {

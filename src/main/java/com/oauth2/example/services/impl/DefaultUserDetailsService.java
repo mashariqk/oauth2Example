@@ -7,6 +7,9 @@ import com.oauth2.example.repositories.RoleRepository;
 import com.oauth2.example.repositories.UserRepository;
 import com.oauth2.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Example;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service("userDetailsService")
@@ -27,10 +32,11 @@ public class DefaultUserDetailsService implements UserDetailsService, UserServic
 	private UserRepository userRepository;
 	@Resource(name = "roleRepository")
 	private RoleRepository roleRepository;
+	@Autowired
+	private ConversionService conversionService;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
 		return userRepository.findOneByUsername(username);
 	}
 
@@ -47,5 +53,19 @@ public class DefaultUserDetailsService implements UserDetailsService, UserServic
 		user.setRoles(roles);
 		userRepository.save(user);
 		return true;
+	}
+
+
+	@Override
+	@Transactional(readOnly = true)
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	public List<UserDTO> fetchByExample(UserDTO userDTO) {
+		Example<User> example = Example.of(conversionService.convert(userDTO,User.class));
+		List<User> users =  userRepository.findAll(example);
+		ArrayList<UserDTO> userDtos = new ArrayList<>();
+		for (User user: users){
+			userDtos.add(conversionService.convert(user,UserDTO.class));
+		}
+		return userDtos;
 	}
 }
