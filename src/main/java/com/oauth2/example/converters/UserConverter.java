@@ -10,7 +10,9 @@ public class UserConverter implements Converter<User,UserDTO> {
         UserDTO target = new UserDTO();
         target.setUsername(source.getUsername());
         target.setEnabled(source.isEnabled());
-        target.setPassword("Credentials: [PROTECTED]");
+        target.setFirstName(source.getFirstName());
+        target.setLastName(source.getLastName());
+        target.setPassword("[PROTECTED]");
         return target;
     }
 }

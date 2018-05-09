@@ -5,8 +5,10 @@ import java.io.Serializable;
 public class UserDTO implements Serializable {
 
     private String username;
-    private String password;
     private Boolean enabled;
+    private String firstName;
+    private String lastName;
+    private String password;
 
     public String getUsername() {
         return username;
@@ -16,13 +18,6 @@ public class UserDTO implements Serializable {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public Boolean getEnabled() {
         return enabled;
@@ -32,10 +27,28 @@ public class UserDTO implements Serializable {
         this.enabled = enabled;
     }
 
-    public UserDTO(String username, String password, Boolean enabled) {
-        this.username = username;
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
         this.password = password;
-        this.enabled = enabled;
     }
 
     public UserDTO() {

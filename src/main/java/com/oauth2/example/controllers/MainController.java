@@ -1,6 +1,7 @@
 package com.oauth2.example.controllers;
 
 import com.oauth2.example.dtos.UserDTO;
+import com.oauth2.example.exceptions.FEBusinessException;
 import com.oauth2.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,13 +31,13 @@ public class MainController {
 
     @RequestMapping(value = "/register", method = {RequestMethod.POST})
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void registerNewUser(@RequestBody UserDTO userDTO) throws Exception {
+    public void registerNewUser(@RequestBody UserDTO userDTO) throws FEBusinessException {
         Assert.notNull(userDTO, "Request body cannot be empty.");
         Assert.notNull(userDTO.getUsername(), "User name cannot be empty.");
         Assert.notNull(userDTO.getPassword(), "Password cannot be empty.");
         UserDetails user = userDetailsService.loadUserByUsername(userDTO.getUsername());
         if (user != null) {
-            throw new Exception("User already exists");
+            throw new FEBusinessException("User already exists","err_user_present");
         }
         userService.createNewUser(userDTO);
         return;

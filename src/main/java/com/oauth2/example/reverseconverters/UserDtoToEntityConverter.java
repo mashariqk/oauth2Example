@@ -11,6 +11,8 @@ public class UserDtoToEntityConverter implements Converter<UserDTO,User> {
         User target = new User();
         target.setUsername(source.getUsername());
         target.setEnabled(true);
+        target.setFirstName(source.getFirstName());
+        target.setLastName(source.getLastName());
         return target;
     }
 }
