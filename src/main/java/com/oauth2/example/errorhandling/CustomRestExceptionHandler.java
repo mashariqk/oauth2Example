@@ -2,6 +2,8 @@ package com.oauth2.example.errorhandling;
 
 import com.oauth2.example.exceptions.FEBusinessException;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +26,17 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @ControllerAdvice(basePackages = {"com.oauth2.example.controllers"})
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Autowired
+    private final MessageSource messageSource;
+
+    public CustomRestExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     // 400
 
@@ -90,7 +100,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     //
 
-    @ExceptionHandler({ MethodArgumentTypeMismatchException.class })
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     public ResponseEntity<Object> handleMethodArgumentTypeMismatch(final MethodArgumentTypeMismatchException ex, final WebRequest request) {
         logger.info(ex.getClass().getName());
         //
@@ -100,7 +110,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
-    @ExceptionHandler({ ConstraintViolationException.class })
+    @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<Object> handleConstraintViolation(final ConstraintViolationException ex, final WebRequest request) {
         logger.info(ex.getClass().getName());
         //
@@ -157,18 +167,25 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     // 500
 
-    @ExceptionHandler({ Exception.class })
+    @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAll(final Exception ex, final WebRequest request) {
         logger.info(ex.getClass().getName());
         logger.error("error", ex);
         //
-        ApiError apiError = null;
-        if (ex instanceof FEBusinessException){
-            apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred",((FEBusinessException) ex).getErrorCode());
-        }else {
-            apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
+        final ApiError apiError;
+        if (ex instanceof FEBusinessException) {
+            apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred1", ((FEBusinessException) ex).getErrorCode());
+        } else {
+            apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred1");
         }
 
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
+    @ExceptionHandler({FEBusinessException.class})
+    public ResponseEntity<Object> handleExceptions(final FEBusinessException ex, Locale locale){
+        String errorMessage = messageSource.getMessage(ex.getErrorCode(),null,locale);
+        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, "error occurred2", ex.getErrorCode());
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
