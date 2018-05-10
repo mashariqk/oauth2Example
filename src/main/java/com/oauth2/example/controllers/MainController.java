@@ -37,7 +37,7 @@ public class MainController {
         Assert.notNull(userDTO.getPassword(), "Password cannot be empty.");
         UserDetails user = userDetailsService.loadUserByUsername(userDTO.getUsername());
         if (user != null) {
-            throw new FEBusinessException("err_user_present","User exists");
+            throw new FEBusinessException("err_user_present","User exists",HttpStatus.NOT_ACCEPTABLE);
         }
         userService.createNewUser(userDTO);
         return;

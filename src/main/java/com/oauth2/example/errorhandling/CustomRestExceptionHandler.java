@@ -41,7 +41,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({FEBusinessException.class})
     public ResponseEntity<Object> handleExceptions(final FEBusinessException ex, Locale locale){
         String errorMessage = messageSource.getMessage(ex.getErrorCode(),null,locale);
-        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, ex.getErrors(), ex.getErrorCode());
+        final ApiError apiError = new ApiError(ex.getStatus(), errorMessage, ex.getErrors(), ex.getErrorCode());
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
