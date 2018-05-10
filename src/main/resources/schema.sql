@@ -1,7 +1,7 @@
 create schema oauth_example collate default;
 
 
-create table oauth_example.role
+create table if not exists oauth_example.role
 (
   role_id int          not null
     primary key,
@@ -9,7 +9,7 @@ create table oauth_example.role
 )
   engine = MyISAM;
 
-create table oauth_example.user_role
+create table if not exists oauth_example.user_role
 (
   user_id bigint not null,
   role_id int    not null,
@@ -17,10 +17,10 @@ create table oauth_example.user_role
 )
   engine = MyISAM;
 
-create index FKa68196081fvovjhkek5m97n3y
+create index if not exists FKa68196081fvovjhkek5m97n3y
   on oauth_example.user_role (role_id);
 
-create table oauth_example.users
+create table if not exists oauth_example.users
 (
   user_id  bigint       not null
     primary key,

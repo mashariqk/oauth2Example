@@ -18,6 +18,7 @@ INSERT INTO oauth_example.users (user_id, username, password, enabled) VALUES
 
 
 INSERT INTO oauth_example.role (role_id, role) VALUES (1,'ROLE_CUSTOMER');
+INSERT INTO oauth_example.role (role_id, role) VALUES (1,'ROLE_ADMIN');
 INSERT INTO oauth_example.user_role (user_id, role_id) VALUES (1,1);
 INSERT INTO oauth_example.user_role (user_id, role_id) VALUES (2,1);
 INSERT INTO oauth_example.user_role (user_id, role_id) VALUES (3,1);
