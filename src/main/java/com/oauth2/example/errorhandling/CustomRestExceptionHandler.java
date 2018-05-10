@@ -38,6 +38,13 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         this.messageSource = messageSource;
     }
 
+    @ExceptionHandler({FEBusinessException.class})
+    public ResponseEntity<Object> handleExceptions(final FEBusinessException ex, Locale locale){
+        String errorMessage = messageSource.getMessage(ex.getErrorCode(),null,locale);
+        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, ex.getErrors(), ex.getErrorCode());
+        return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
     // 400
 
     @Override
@@ -172,21 +179,8 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
         logger.info(ex.getClass().getName());
         logger.error("error", ex);
         //
-        final ApiError apiError;
-        if (ex instanceof FEBusinessException) {
-            apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred1", ((FEBusinessException) ex).getErrorCode());
-        } else {
-            apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred1");
-        }
+        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "An unexpected error has occurred");
 
         return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
     }
-
-    @ExceptionHandler({FEBusinessException.class})
-    public ResponseEntity<Object> handleExceptions(final FEBusinessException ex, Locale locale){
-        String errorMessage = messageSource.getMessage(ex.getErrorCode(),null,locale);
-        final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, "error occurred2", ex.getErrorCode());
-        return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
-    }
-
 }
