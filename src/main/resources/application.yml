@@ -4,7 +4,10 @@ spring:
     driverClassName: com.mysql.jdbc.Driver
     platform: mysql
     username: root
-    password: password
+    password: ENC(ed8ittP0Mg6kJjiQZHFWmkxFKE6uCsKK)
+# Using jasypt for property encryption. Override this at time of startup with -Djasypt.encryptor.password={your prod password}
+# java -cp ~/.m2/repository/org/jasypt/jasypt/1.9.2/jasypt-1.9.2.jar  org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI input="password" password=secretkey algorithm=PBEWITHSHA1ANDRC2_40
+
   jpa:
     database: MySQL
     generate-ddl: true
@@ -24,4 +27,7 @@ logging:
     org.springframework.security: TRACE
     com.oauth2.example: DEBUG
 
-
+jasypt:
+  encryptor:
+    algorithm: PBEWITHSHA1ANDRC2_40
+    password: secretkey
